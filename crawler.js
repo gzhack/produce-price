@@ -40,7 +40,7 @@ var transform = function (data, callback) {n
 };
 
 var crawlHelper = function(pageNumTotal, cb) {
-  async.mapLimit(_.range(1, pageNumTotal+1), 10, crawl, function(err, results) {
+  async.mapLimit(_.range(1, pageNumTotal+1), 5, crawl, function(err, results) {
     if (err) return cb(err);
     cb(null, _.flatten(results));
   });
@@ -66,7 +66,13 @@ var crawl = function(pageNum, cb) {
         });
       });
 
-      console.log('finished page: ' + pageNum);
+      window.close();
+      if (process.memoryUsage().heapUsed > 200000000) { 
+        //only call if memory use is bove 200MB
+        global.gc();
+      }
+
+      console.log('finished page: '+pageNum);
 
       return cb(null, _.map(result[keys[0]], function(val, index) {
         var row = {};
